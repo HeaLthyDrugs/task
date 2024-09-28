@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_app/data/database.dart';
 import 'package:todo_app/util/todo_tile.dart';
+import 'package:lottie/lottie.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,9 +11,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   final _myBox = Hive.box('myBox');
   ToDoDatabase db = ToDoDatabase();
+
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -22,6 +26,13 @@ class _HomePageState extends State<HomePage> {
       db.loadData();
     }
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   final _controller = TextEditingController();
@@ -138,6 +149,13 @@ class _HomePageState extends State<HomePage> {
           ),
           // centerTitle: true,
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: [
+              Tab(text: 'Ongoing'),
+              Tab(text: 'Completed'),
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: createNewTask,
@@ -150,19 +168,67 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(100),
           ),
         ),
-        body: ReorderableListView.builder(
-          itemCount: db.toDoList.length,
-          itemBuilder: (context, index) {
-            return TodoTile(
-              key: ValueKey(db.toDoList[index]),
-              taskName: db.toDoList[index][0],
-              taskCompleted: db.toDoList[index][1],
-              onChanged: (value) => checkBoxChanged(value, index),
-              deleteFunction: (context) => deleteTask(index),
-              index: index,
-            );
-          },
-          onReorder: onReorder,
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildTaskList(false),
+            _buildTaskList(true),
+          ],
         ));
+  }
+
+  Widget _buildTaskList(bool isCompleted) {
+    final filteredList =
+        db.toDoList.where((task) => task[1] == isCompleted).toList();
+
+    if (filteredList.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 100),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Lottie.asset(
+                'assets/animations/ghost.json',
+                width: 200,
+                height: 200,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: 20),
+              Text(
+                isCompleted ? 'No completed tasks yet' : 'No ongoing tasks',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ReorderableListView.builder(
+      itemCount: filteredList.length,
+      itemBuilder: (context, index) {
+        return TodoTile(
+          key: ValueKey(filteredList[index]),
+          taskName: filteredList[index][0],
+          taskCompleted: filteredList[index][1],
+          onChanged: (value) =>
+              checkBoxChanged(value, db.toDoList.indexOf(filteredList[index])),
+          deleteFunction: (context) =>
+              deleteTask(db.toDoList.indexOf(filteredList[index])),
+          index: index,
+        );
+      },
+      onReorder: (oldIndex, newIndex) {
+        final globalOldIndex = db.toDoList.indexOf(filteredList[oldIndex]);
+        final globalNewIndex = db.toDoList.indexOf(filteredList[newIndex]);
+        onReorder(globalOldIndex, globalNewIndex);
+      },
+    );
   }
 }
