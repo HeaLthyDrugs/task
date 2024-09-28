@@ -44,7 +44,10 @@ class TodoTile extends StatelessWidget {
               Checkbox(
                 value: taskCompleted,
                 onChanged: onChanged,
-                activeColor: Colors.black,
+                activeColor: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
               ),
               // Task name
               Text(
@@ -52,12 +55,13 @@ class TodoTile extends StatelessWidget {
                 style: TextStyle(
                     decoration: taskCompleted
                         ? TextDecoration.lineThrough
-                        : TextDecoration.none),
+                        : TextDecoration.none,
+                    color: Theme.of(context).colorScheme.primary),
               ),
             ],
           ),
           decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 255, 255, 255),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16)),
         ),
       ),

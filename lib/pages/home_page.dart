@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/data/database.dart';
+import 'package:todo_app/main.dart';
+import 'package:todo_app/theme/theme.dart';
+import 'package:todo_app/theme/theme_provider.dart';
 import 'package:todo_app/util/todo_tile.dart';
 import 'package:lottie/lottie.dart';
 
@@ -73,6 +77,8 @@ class _HomePageState extends State<HomePage>
     db.updateData();
   }
 
+  // Create a new task
+
   void createNewTask() {
     showModalBottomSheet(
       context: context,
@@ -130,7 +136,7 @@ class _HomePageState extends State<HomePage>
   void onReorder(int oldIndex, int newIndex) {
     setState(() {
       if (oldIndex < newIndex) {
-        newIndex -= 1;
+        newIndex--;
       }
       final item = db.toDoList.removeAt(oldIndex);
       db.toDoList.insert(newIndex, item);
@@ -141,16 +147,30 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           title: Text(
             'Task',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
           ),
-          // centerTitle: true,
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          actions: [
+            IconButton(
+              icon: Icon(
+                Provider.of<ThemeProvider>(context).getTheme() == lightMode
+                    ? Icons.dark_mode
+                    : Icons.light_mode,
+              ),
+              onPressed: () {
+                Provider.of<ThemeProvider>(context, listen: false)
+                    .toggleTheme();
+              },
+            ),
+          ],
           bottom: TabBar(
             controller: _tabController,
+            indicatorColor: Theme.of(context).colorScheme.primary,
+            indicatorWeight: 2,
             tabs: [
               Tab(text: 'Ongoing'),
               Tab(text: 'Completed'),
@@ -161,9 +181,9 @@ class _HomePageState extends State<HomePage>
           onPressed: createNewTask,
           child: Icon(
             Icons.add,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
-          backgroundColor: Colors.black,
+          backgroundColor: Theme.of(context).colorScheme.onSurface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
           ),
@@ -225,9 +245,20 @@ class _HomePageState extends State<HomePage>
         );
       },
       onReorder: (oldIndex, newIndex) {
-        final globalOldIndex = db.toDoList.indexOf(filteredList[oldIndex]);
-        final globalNewIndex = db.toDoList.indexOf(filteredList[newIndex]);
-        onReorder(globalOldIndex, globalNewIndex);
+        setState(() {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          final item = filteredList.removeAt(oldIndex);
+          filteredList.insert(newIndex, item);
+
+          // Update the main list to match the new order
+          db.toDoList = [
+            ...db.toDoList.where((task) => task[1] != isCompleted),
+            ...filteredList,
+          ];
+        });
+        db.updateData();
       },
     );
   }
