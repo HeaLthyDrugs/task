@@ -39,12 +39,17 @@ class TodoTile extends StatelessWidget {
             children: [
               ReorderableDragStartListener(
                 index: index,
-                child: Icon(Icons.drag_handle),
+                child: Icon(
+                  Icons.drag_indicator,
+                  size: 20,
+                ),
               ),
               Checkbox(
                 value: taskCompleted,
                 onChanged: onChanged,
-                activeColor: Theme.of(context).colorScheme.primary,
+                activeColor: Theme.of(context).colorScheme.surface,
+                checkColor: Theme.of(context).colorScheme.primary,
+                splashRadius: 10,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                 ),
@@ -53,6 +58,7 @@ class TodoTile extends StatelessWidget {
               Text(
                 taskName,
                 style: TextStyle(
+                    fontFamily: 'Montserrat',
                     decoration: taskCompleted
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,

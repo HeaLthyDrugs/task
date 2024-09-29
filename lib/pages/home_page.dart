@@ -94,34 +94,42 @@ class _HomePageState extends State<HomePage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
+                  maxLines: 3,
                   controller: _controller,
                   decoration: InputDecoration(
-                    hintText: 'Add a new task',
+                    hintText: 'Add task',
+                    hintStyle:
+                        TextStyle(color: Colors.grey, fontFamily: 'Montserrat'),
+                    disabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 1,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text('Cancel'),
-                      style: ElevatedButton.styleFrom(),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        saveNewTask();
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Save',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                      ),
+                    Icon(Icons.access_time, size: 24, color: Colors.grey),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            saveNewTask();
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                                color: Colors.green.shade400,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Montserrat'),
+                          ),
+                        ),
+                        Icon(Icons.access_time, size: 24, color: Colors.grey),
+                      ],
                     ),
                   ],
                 ),
@@ -151,7 +159,11 @@ class _HomePageState extends State<HomePage>
         appBar: AppBar(
           title: Text(
             'Task',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
+            style: TextStyle(
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1,
+                fontSize: 30,
+                fontFamily: 'Montserrat'),
           ),
           backgroundColor: Theme.of(context).colorScheme.surface,
           actions: [
@@ -160,6 +172,8 @@ class _HomePageState extends State<HomePage>
                 Provider.of<ThemeProvider>(context).getTheme() == lightMode
                     ? Icons.dark_mode
                     : Icons.light_mode,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
               ),
               onPressed: () {
                 Provider.of<ThemeProvider>(context, listen: false)
@@ -171,6 +185,7 @@ class _HomePageState extends State<HomePage>
             controller: _tabController,
             indicatorColor: Theme.of(context).colorScheme.primary,
             indicatorWeight: 2,
+            labelStyle: TextStyle(fontFamily: 'Montserrat'),
             tabs: [
               Tab(text: 'Ongoing'),
               Tab(text: 'Completed'),
