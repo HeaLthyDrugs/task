@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/data/database.dart';
+import 'package:todo_app/helper/notification_helper.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/theme/theme.dart';
 import 'package:todo_app/theme/theme_provider.dart';
@@ -112,7 +113,13 @@ class _HomePageState extends State<HomePage>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.access_time, size: 24, color: Colors.grey),
+                    // Icon(Icons.access_time, size: 24, color: Colors.grey),
+                    ElevatedButton(
+                        onPressed: () {
+                          NotificationHelper.scheduleNotification(
+                              "Test", "my app notification", 5);
+                        },
+                        child: const Text("Set Notification")),
                     Row(
                       children: [
                         GestureDetector(
