@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart'; // Add this import
 
 class TodoTile extends StatelessWidget {
   final String taskName;
   final bool taskCompleted;
+  final DateTime? taskDateTime;
   Function(bool?)? onChanged;
   Function(BuildContext)? deleteFunction;
   final int index;
 
-  TodoTile(
-      {super.key,
-      required this.taskName,
-      required this.taskCompleted,
-      required this.onChanged,
-      required this.deleteFunction,
-      required this.index});
+  TodoTile({
+    required Key key, // Add this line
+    required this.taskName,
+    required this.taskCompleted,
+    this.taskDateTime,
+    required this.onChanged,
+    required this.deleteFunction,
+    required this.index,
+  }) : super(key: key); // Add this line
 
   @override
   Widget build(BuildContext context) {
@@ -54,15 +58,34 @@ class TodoTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(100),
                 ),
               ),
-              // Task name
-              Text(
-                taskName,
-                style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    decoration: taskCompleted
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
-                    color: Theme.of(context).colorScheme.primary),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      taskName,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        decoration: taskCompleted
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    if (taskDateTime != null)
+                      Text(
+                        DateFormat('MMM d, y HH:mm').format(taskDateTime!),
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 12,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.7),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),

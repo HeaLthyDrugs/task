@@ -7,10 +7,8 @@ class ToDoDatabase {
 
   void createInitialData() {
     toDoList = [
-      ["Make Bed", false],
-      ["Eat Breakfast", false],
-      ["Do Exercise", false],
-      ["Meditate", false],
+      ["Make Tutorial", false, DateTime.now()],
+      ["Do Exercise", false, DateTime.now()],
     ];
   }
 
