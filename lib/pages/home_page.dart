@@ -88,17 +88,22 @@ class _HomePageState extends State<HomePage>
     db.updateData();
   }
 
-  void saveNewTask() {
-    setState(() {
-      db.toDoList.add([
+  void saveNewTask() async {
+    // Make this method async
+    int? notificationId;
+    if (_selectedDateTime != null) {
+      notificationId = await NotificationHelper.scheduleNotification(
+        'Task Reminder',
         _controller.text,
-        false,
-        _selectedDateTime ?? DateTime.now(), // Provide a default value
-      ]);
+        _selectedDateTime!,
+      );
+    }
+
+    setState(() {
+      db.addTask(_controller.text, _selectedDateTime, notificationId);
       _controller.clear();
       _selectedDateTime = null;
     });
-    db.updateData();
   }
 
   // Create a new task
@@ -330,13 +335,19 @@ class _HomePageState extends State<HomePage>
       );
       if (pickedTime != null) {
         setState(() {
-          final DateTime selectedDateTime = DateTime(
+          DateTime selectedDateTime = DateTime(
             pickedDate.year,
             pickedDate.month,
             pickedDate.day,
             pickedTime.hour,
             pickedTime.minute,
           );
+
+          // Ensure the selected time is in the future
+          if (selectedDateTime.isBefore(DateTime.now())) {
+            selectedDateTime = DateTime.now().add(const Duration(minutes: 1));
+          }
+
           _selectedDateTime = selectedDateTime;
         });
       }

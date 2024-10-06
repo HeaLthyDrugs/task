@@ -1,12 +1,12 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-// Add this import
 import 'package:flutter/foundation.dart';
 
 class NotificationHelper {
   static final _notification = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
+  static int _notificationId = 0;
 
   static Future<void> init() async {
     if (!_initialized) {
@@ -20,16 +20,17 @@ class NotificationHelper {
     }
   }
 
-  static Future<void> scheduleNotification(
+  static Future<int> scheduleNotification(
     String title,
     String body,
-    int userDayInput,
+    DateTime scheduledDateTime,
   ) async {
     await init(); // Ensure initialization before scheduling
 
     var androidDetails = const AndroidNotificationDetails(
       "important_notification",
-      "My channel",
+      "Task Reminders",
+      channelDescription: "Notifications for scheduled tasks",
       importance: Importance.max,
       priority: Priority.high,
       enableVibration: true,
@@ -42,12 +43,22 @@ class NotificationHelper {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestExactAlarmsPermission();
 
+    int id = _notificationId++;
+
+    // Ensure the scheduled time is in the future
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime.from(scheduledDateTime, tz.local);
+    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
+      scheduledDate =
+          tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5));
+    }
+
     if (result ?? false) {
       await _notification.zonedSchedule(
-        0,
-        title,
-        body,
-        tz.TZDateTime.now(tz.local).add(Duration(seconds: userDayInput)),
+        id,
+        "Task Reminder", // Title of the notification
+        body, // This will be the task name
+        scheduledDate,
         notificationDetails,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
@@ -59,16 +70,18 @@ class NotificationHelper {
       }
       // Fallback to inexact scheduling
       await _notification.zonedSchedule(
-        0,
-        title,
-        body,
-        tz.TZDateTime.now(tz.local).add(Duration(seconds: userDayInput)),
+        id,
+        "Task Reminder", // Title of the notification
+        body, // This will be the task name
+        scheduledDate,
         notificationDetails,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
     }
+
+    return id; // Return the notification ID
   }
 
   static Future<void> cancelAllNotifications() async {

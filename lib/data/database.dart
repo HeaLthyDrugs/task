@@ -7,8 +7,8 @@ class ToDoDatabase {
 
   void createInitialData() {
     toDoList = [
-      ["Make Tutorial", false, DateTime.now()],
-      ["Do Exercise", false, DateTime.now()],
+      ["Make Tutorial", false, DateTime.now(), null],
+      ["Do Exercise", false, DateTime.now(), null],
     ];
   }
 
@@ -18,5 +18,18 @@ class ToDoDatabase {
 
   void updateData() {
     _myBox.put('TODOLIST', toDoList);
+  }
+
+  void addTask(
+      String taskName, DateTime? scheduledDateTime, int? notificationId) {
+    toDoList.add([taskName, false, scheduledDateTime, notificationId]);
+    updateData();
+  }
+
+  void updateTaskNotificationId(int taskIndex, int notificationId) {
+    if (taskIndex >= 0 && taskIndex < toDoList.length) {
+      toDoList[taskIndex][3] = notificationId;
+      updateData();
+    }
   }
 }
