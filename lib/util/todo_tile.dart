@@ -45,14 +45,18 @@ class TodoTile extends StatelessWidget {
                 index: index,
                 child: Icon(
                   Icons.drag_indicator,
-                  size: 20,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
               Checkbox(
                 value: taskCompleted,
                 onChanged: onChanged,
                 activeColor: Theme.of(context).colorScheme.surface,
-                checkColor: Theme.of(context).colorScheme.primary,
+                checkColor: Theme.of(context).colorScheme.onPrimary,
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
                 splashRadius: 10,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
@@ -80,7 +84,7 @@ class TodoTile extends StatelessWidget {
                           fontSize: 12,
                           color: Theme.of(context)
                               .colorScheme
-                              .primary
+                              .onPrimary
                               .withOpacity(0.7),
                         ),
                       ),

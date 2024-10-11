@@ -172,13 +172,23 @@ class _HomePageState extends State<HomePage>
                             saveNewTask();
                             Navigator.pop(context);
                           },
-                          child: Text(
-                            'Save',
-                            style: TextStyle(
-                              color: Colors.green.shade400,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Montserrat',
-                            ),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Save',
+                                style: TextStyle(
+                                  color: Colors.green.shade400,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(
+                                Icons.add_task_rounded,
+                                color: Colors.green.shade400,
+                                size: 20,
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -212,9 +222,9 @@ class _HomePageState extends State<HomePage>
           title: Text(
             'Task',
             style: TextStyle(
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
                 letterSpacing: 1,
-                fontSize: 32,
+                fontSize: 30,
                 fontFamily: 'Montserrat'),
           ),
           backgroundColor: Theme.of(context).colorScheme.surface,
@@ -225,7 +235,7 @@ class _HomePageState extends State<HomePage>
                     ? Icons.dark_mode
                     : Icons.light_mode,
                 size: 20,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
               onPressed: () {
                 Provider.of<ThemeProvider>(context, listen: false)
@@ -235,9 +245,11 @@ class _HomePageState extends State<HomePage>
           ],
           bottom: TabBar(
             controller: _tabController,
-            indicatorColor: Theme.of(context).colorScheme.primary,
+            indicatorColor: Theme.of(context).colorScheme.onPrimary,
             indicatorWeight: 2,
             labelStyle: TextStyle(fontFamily: 'Montserrat'),
+            dividerColor: Theme.of(context).colorScheme.surface,
+            unselectedLabelColor: Theme.of(context).colorScheme.onPrimary,
             tabs: [
               Tab(text: 'Ongoing'),
               Tab(text: 'Completed'),
@@ -248,7 +260,7 @@ class _HomePageState extends State<HomePage>
           onPressed: createNewTask,
           child: Icon(
             Icons.add,
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: Theme.of(context).colorScheme.surface,
           ),
           backgroundColor: Theme.of(context).colorScheme.onSurface,
           shape: RoundedRectangleBorder(
