@@ -34,6 +34,7 @@ class NotificationHelper {
       importance: Importance.max,
       priority: Priority.high,
       enableVibration: true,
+      icon: 'ic_notification',
     );
     var notificationDetails = NotificationDetails(android: androidDetails);
 

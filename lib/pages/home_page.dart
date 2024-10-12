@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage>
     int? notificationId;
     if (_selectedDateTime != null) {
       notificationId = await NotificationHelper.scheduleNotification(
-        'Task Reminder',
+        '⏰ Task Reminder',
         _controller.text,
         _selectedDateTime!,
       );
