@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter/foundation.dart';
+import 'package:todo_app/main.dart';
 
 class NotificationHelper {
   static final _notification = FlutterLocalNotificationsPlugin();
@@ -9,6 +10,8 @@ class NotificationHelper {
   static int _notificationId = 0;
 
   static Future<void> init() async {
+    await flutterLocalNotificationsPlugin
+        .cancel(NotificationHelper._notificationId);
     if (!_initialized) {
       tz.initializeTimeZones();
       tz.setLocalLocation(
@@ -88,4 +91,6 @@ class NotificationHelper {
   static Future<void> cancelAllNotifications() async {
     await _notification.cancelAll();
   }
+
+  static cancelNotification(notificationId) {}
 }

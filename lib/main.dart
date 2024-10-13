@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/helper/notification_helper.dart';
 import 'package:todo_app/pages/home_page.dart';
+import 'package:todo_app/pages/splash.dart';
 import 'package:todo_app/theme/theme.dart';
 import 'package:todo_app/theme/theme_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: context.watch<ThemeProvider>().getTheme(),
-      home: const HomePage(),
+      home: const Splash(),
     );
   }
 }

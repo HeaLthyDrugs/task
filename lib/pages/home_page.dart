@@ -81,7 +81,14 @@ class _HomePageState extends State<HomePage>
     db.updateData();
   }
 
-  void deleteTask(int index) {
+  void deleteTask(int index) async {
+    final task = db.toDoList[index];
+    final notificationId = task.length > 3 ? task[3] : null;
+
+    if (notificationId != null) {
+      await flutterLocalNotificationsPlugin.cancel(notificationId);
+    }
+
     setState(() {
       db.toDoList.removeAt(index);
     });
