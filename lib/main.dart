@@ -7,13 +7,15 @@ import 'package:todo_app/pages/splash.dart';
 import 'package:todo_app/theme/theme.dart';
 import 'package:todo_app/theme/theme_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  NotificationHelper.init();
+  await requestPermissions();
+  await NotificationHelper.init();
   await Hive.initFlutter();
 
   var box = await Hive.openBox('myBox');
@@ -33,6 +35,15 @@ void main() async {
 
   runApp(ChangeNotifierProvider(
       create: (context) => ThemeProvider(), child: const MyApp()));
+}
+
+Future<void> requestPermissions() async {
+  await Permission.notification.request();
+  if (await Permission.scheduleExactAlarm.request().isGranted) {
+    // This permission is only available on Android 12 and above
+    // For lower versions, this will always return true
+    print('Exact alarm permission granted');
+  }
 }
 
 class MyApp extends StatelessWidget {

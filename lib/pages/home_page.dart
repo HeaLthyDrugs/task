@@ -96,21 +96,34 @@ class _HomePageState extends State<HomePage>
   }
 
   void saveNewTask() async {
-    // Make this method async
-    int? notificationId;
-    if (_selectedDateTime != null) {
-      notificationId = await NotificationHelper.scheduleNotification(
-        '⏰ Task Reminder',
-        _controller.text,
-        _selectedDateTime!,
+    try {
+      int? notificationId;
+      if (_selectedDateTime != null) {
+        notificationId = await NotificationHelper.scheduleNotification(
+          '⏰ Task Reminder',
+          _controller.text,
+          _selectedDateTime!,
+        );
+      }
+
+      setState(() {
+        db.addTask(_controller.text, _selectedDateTime, notificationId);
+        _controller.clear();
+        _selectedDateTime = null;
+      });
+      db.updateData();
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Task added successfully')),
+      );
+    } catch (e) {
+      print('Error saving task: $e');
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add task: $e')),
       );
     }
-
-    setState(() {
-      db.addTask(_controller.text, _selectedDateTime, notificationId);
-      _controller.clear();
-      _selectedDateTime = null;
-    });
   }
 
   // Create a new task
