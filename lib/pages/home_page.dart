@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_app/data/database.dart';
 import 'package:todo_app/helper/notification_helper.dart';
 import 'package:todo_app/main.dart';
+import 'package:todo_app/pages/splash.dart';
 import 'package:todo_app/theme/theme.dart';
 import 'package:todo_app/theme/theme_provider.dart';
 import 'package:todo_app/util/todo_tile.dart';
@@ -213,6 +214,8 @@ class _HomePageState extends State<HomePage>
                         ),
                       ],
                     ),
+                    SizedBox(height: 20),
+                    // New button for navigating to Splash screen
                   ],
                 ),
               ),
