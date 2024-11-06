@@ -11,15 +11,23 @@ class NotificationHelper {
   static int _notificationId = 0;
 
   static Future<void> init() async {
-    await flutterLocalNotificationsPlugin
-        .cancel(NotificationHelper._notificationId);
     if (!_initialized) {
       tz.initializeTimeZones();
-      tz.setLocalLocation(
-          tz.getLocation('Asia/Kolkata')); // Set to Indian Standard Time
-      await _notification.initialize(const InitializationSettings(
-        android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-      ));
+      tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+
+      const AndroidInitializationSettings androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+
+      const InitializationSettings initSettings =
+          InitializationSettings(android: androidSettings);
+
+      await _notification.initialize(
+        initSettings,
+        onDidReceiveNotificationResponse: (details) {
+          // Handle notification tap
+        },
+      );
+
       _initialized = true;
     }
   }
@@ -30,7 +38,10 @@ class NotificationHelper {
     DateTime scheduledDateTime,
   ) async {
     try {
-      await init(); // Ensure initialization before scheduling
+      // Ensure initialization before scheduling
+      if (!_initialized) {
+        await init();
+      }
 
       // Check for notification permission
       if (!(await Permission.notification.isGranted)) {
@@ -38,13 +49,13 @@ class NotificationHelper {
       }
 
       var androidDetails = const AndroidNotificationDetails(
-        "important_notification",
-        "Task Reminders",
-        channelDescription: "Notifications for scheduled tasks",
+        'important_notification', // channel id
+        'Task Reminders', // channel name
+        channelDescription: 'Notifications for scheduled tasks',
         importance: Importance.max,
         priority: Priority.high,
         enableVibration: true,
-        icon: 'ic_notification',
+        icon: '@mipmap/ic_launcher',
       );
       var notificationDetails = NotificationDetails(android: androidDetails);
 

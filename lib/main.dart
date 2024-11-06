@@ -15,23 +15,24 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await requestPermissions();
-  await NotificationHelper.init();
-  await Hive.initFlutter();
-
-  var box = await Hive.openBox('myBox');
 
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('ic_notification');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
-    // ... iOS settings if needed
   );
 
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
-    // ... other initialization parameters
+    onDidReceiveNotificationResponse: (details) {
+      // Handle notification tap
+    },
   );
+
+  await Hive.initFlutter();
+  var box = await Hive.openBox('myBox');
+  await NotificationHelper.init();
 
   runApp(ChangeNotifierProvider(
       create: (context) => ThemeProvider(), child: const MyApp()));
