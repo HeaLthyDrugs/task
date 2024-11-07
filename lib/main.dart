@@ -30,6 +30,8 @@ void main() async {
     },
   );
 
+  await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
   await NotificationHelper.init();
 
   await Hive.initFlutter();

@@ -55,9 +55,12 @@ class NotificationHelper {
         importance: Importance.max,
         priority: Priority.high,
         enableVibration: true,
-        icon: '@mipmap/ic_launcher',
+        icon: '@drawable/ic_notification',
         playSound: true,
         styleInformation: DefaultStyleInformation(true, true),
+        ticker: 'Task Reminder',
+        category: AndroidNotificationCategory.reminder,
+        visibility: NotificationVisibility.public,
       );
       var notificationDetails = NotificationDetails(android: androidDetails);
 
@@ -80,6 +83,7 @@ class NotificationHelper {
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
       );
 
       return id;
@@ -95,7 +99,12 @@ class NotificationHelper {
 
   static Future<void> cancelNotification(int id) async {
     try {
-      await _notification.cancel(id);
+      final List<PendingNotificationRequest> pendingNotifications =
+          await _notification.pendingNotificationRequests();
+
+      if (pendingNotifications.any((notification) => notification.id == id)) {
+        await _notification.cancel(id);
+      }
     } catch (e) {
       print('Error canceling notification: $e');
     }
