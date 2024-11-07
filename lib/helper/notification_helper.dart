@@ -21,7 +21,7 @@ class NotificationHelper {
 
         // Initialize notification settings
         const AndroidInitializationSettings androidSettings =
-            AndroidInitializationSettings('@mipmap/ic_launcher');
+            AndroidInitializationSettings('@drawable/ic_notification');
 
         const InitializationSettings initSettings =
             InitializationSettings(android: androidSettings);
