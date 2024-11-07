@@ -56,6 +56,8 @@ class NotificationHelper {
         priority: Priority.high,
         enableVibration: true,
         icon: '@mipmap/ic_launcher',
+        playSound: true,
+        styleInformation: DefaultStyleInformation(true, true),
       );
       var notificationDetails = NotificationDetails(android: androidDetails);
 
@@ -69,37 +71,21 @@ class NotificationHelper {
             tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5));
       }
 
-      // Check for exact alarm permission
-      if (await Permission.scheduleExactAlarm.isGranted) {
-        await _notification.zonedSchedule(
-          id,
-          title,
-          body,
-          scheduledDate,
-          notificationDetails,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        );
-      } else {
-        print('Exact alarms permission not granted');
-        // Fallback to inexact scheduling
-        await _notification.zonedSchedule(
-          id,
-          title,
-          body,
-          scheduledDate,
-          notificationDetails,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        );
-      }
+      await _notification.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
 
-      return id; // Return the notification ID
+      return id;
     } catch (e) {
       print('Error scheduling notification: $e');
-      throw e; // Re-throw the error to be caught in saveNewTask
+      throw e;
     }
   }
 
@@ -107,5 +93,11 @@ class NotificationHelper {
     await _notification.cancelAll();
   }
 
-  static cancelNotification(notificationId) {}
+  static Future<void> cancelNotification(int id) async {
+    try {
+      await _notification.cancel(id);
+    } catch (e) {
+      print('Error canceling notification: $e');
+    }
+  }
 }

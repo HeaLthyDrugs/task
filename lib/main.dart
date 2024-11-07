@@ -30,9 +30,10 @@ void main() async {
     },
   );
 
+  await NotificationHelper.init();
+
   await Hive.initFlutter();
   var box = await Hive.openBox('myBox');
-  await NotificationHelper.init();
 
   runApp(ChangeNotifierProvider(
       create: (context) => ThemeProvider(), child: const MyApp()));

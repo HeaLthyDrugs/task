@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage>
     final notificationId = task.length > 3 ? task[3] : null;
 
     if (notificationId != null) {
-      await flutterLocalNotificationsPlugin.cancel(notificationId);
+      await NotificationHelper.cancelNotification(notificationId);
     }
 
     setState(() {
