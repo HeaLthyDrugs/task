@@ -12,23 +12,37 @@ class NotificationHelper {
 
   static Future<void> init() async {
     if (!_initialized) {
-      tz.initializeTimeZones();
-      tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+      try {
+        // Initialize timezones
+        tz.initializeTimeZones();
+        final String timeZoneName =
+            'Asia/Kolkata'; // You might want to get this dynamically
+        tz.setLocalLocation(tz.getLocation(timeZoneName));
 
-      const AndroidInitializationSettings androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+        // Initialize notification settings
+        const AndroidInitializationSettings androidSettings =
+            AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      const InitializationSettings initSettings =
-          InitializationSettings(android: androidSettings);
+        const InitializationSettings initSettings =
+            InitializationSettings(android: androidSettings);
 
-      await _notification.initialize(
-        initSettings,
-        onDidReceiveNotificationResponse: (details) {
-          // Handle notification tap
-        },
-      );
+        // Initialize plugin
+        final bool? success = await _notification.initialize(
+          initSettings,
+          onDidReceiveNotificationResponse: (details) {
+            // Handle notification tap
+          },
+        );
 
-      _initialized = true;
+        if (success ?? false) {
+          _initialized = true;
+        } else {
+          throw Exception('Notification initialization failed');
+        }
+      } catch (e) {
+        print('Error initializing notifications: $e');
+        rethrow;
+      }
     }
   }
 
@@ -38,58 +52,51 @@ class NotificationHelper {
     DateTime scheduledDateTime,
   ) async {
     try {
-      // Ensure initialization before scheduling
+      // Ensure initialization
       if (!_initialized) {
         await init();
       }
 
-      // Check for notification permission
-      if (!(await Permission.notification.isGranted)) {
-        throw Exception('Notification permission not granted');
-      }
-
-      var androidDetails = const AndroidNotificationDetails(
-        'important_notification', // channel id
-        'Task Reminders', // channel name
+      // Create notification details
+      final androidDetails = const AndroidNotificationDetails(
+        'important_notification',
+        'Task Reminders',
         channelDescription: 'Notifications for scheduled tasks',
         importance: Importance.max,
         priority: Priority.high,
         enableVibration: true,
-        icon: '@drawable/ic_notification',
         playSound: true,
         styleInformation: DefaultStyleInformation(true, true),
-        ticker: 'Task Reminder',
         category: AndroidNotificationCategory.reminder,
-        visibility: NotificationVisibility.public,
       );
-      var notificationDetails = NotificationDetails(android: androidDetails);
 
-      int id = _notificationId++;
+      final notificationDetails = NotificationDetails(android: androidDetails);
 
-      // Ensure the scheduled time is in the future
-      tz.TZDateTime scheduledDate =
-          tz.TZDateTime.from(scheduledDateTime, tz.local);
-      if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
-        scheduledDate =
-            tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5));
-      }
+      // Generate notification ID
+      final int id = _notificationId++;
 
+      // Convert to TZDateTime
+      final tz.TZDateTime scheduledTZDate = tz.TZDateTime.from(
+        scheduledDateTime,
+        tz.local,
+      );
+
+      // Schedule the notification
       await _notification.zonedSchedule(
         id,
         title,
         body,
-        scheduledDate,
+        scheduledTZDate,
         notificationDetails,
-        androidAllowWhileIdle: true,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
       );
 
       return id;
     } catch (e) {
       print('Error scheduling notification: $e');
-      throw e;
+      rethrow;
     }
   }
 
